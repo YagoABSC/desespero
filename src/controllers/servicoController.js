@@ -155,28 +155,51 @@ class ServicoController {
     async finalizarServico(req, res) {
         try {
             const { servico_id } = req.body;
-
+    
             const servico = await database('servicos_postados')
                 .where({ id: servico_id, status: 'aceito' })
                 .first();
-
+    
             if (!servico) {
                 return res.status(404).json({ message: "Serviço não encontrado ou já finalizado." });
             }
-
+    
+            // Obtém o e-mail do contratante
+            const contratante = await database('usuarios')
+                .where({ id: servico.contratante_id })
+                .first();
+    
+            if (!contratante) {
+                return res.status(404).json({ message: "Contratante não encontrado." });
+            }
+    
+            // Atualiza o status para "aguardando confirmação"
             await database('servicos_postados')
                 .where({ id: servico_id })
                 .update({
                     status: 'aguardando confirmacao',
                     data_finalizacao: getBrazilianTimestamp()
                 });
-
-            return res.status(200).json({ message: "Serviço aguardando confirmação do contratante." });
+    
+            // Envia o e-mail para o contratante
+            const emailBody = `
+                O serviço ${servico_id} foi marcado como concluído pelo prestador. 
+                Você deseja confirmar a finalização? 
+                Clique aqui: https://desespero-kappa.vercel.app/servicos/confirmar-finalizacao?servico_id=${servico_id}&resposta=sim 
+                ou recuse aqui: https://desespero-kappa.vercel.app/servicos/confirmar-finalizacao?servico_id=${servico_id}&resposta=nao
+            `;
+    
+            await sendEmail(contratante.email, "Confirmação de Finalização do Serviço", emailBody);
+    
+            return res.status(200).json({ message: "Serviço aguardando confirmação do contratante. E-mail enviado!" });
+    
         } catch (error) {
             console.error("Erro ao finalizar serviço:", error);
             return res.status(500).json({ message: "Erro ao finalizar o serviço." });
         }
     }
+    
+
 
     iniciarJobFinalizacaoAutomatica() {
         cron.schedule('0 * * * *', async () => {
