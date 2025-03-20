@@ -165,7 +165,7 @@ class ServicoController {
             }
     
             // Obtém o e-mail do contratante
-            const contratante = await database('usuarios')
+            const contratante = await database('contratantes')
                 .where({ id: servico.contratante_id })
                 .first();
     
