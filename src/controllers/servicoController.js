@@ -183,10 +183,10 @@ class ServicoController {
 
             // Envia o e-mail para o contratante
             const emailBody = `
-                O serviço ${servico_id} foi marcado como concluído pelo prestador. 
+                O serviço foi marcado como concluído pelo prestador. 
                 Você deseja confirmar a finalização? 
-                Clique aqui: https://desespero-kappa.vercel.app/confirmarFinalizacao?servico_id=${servico_id}&resposta=sim 
-                ou recuse aqui: https://desespero-kappa.vercel.app/servicos/confirmarFinalizacao?servico_id=${servico_id}&resposta=nao
+                Clique aqui: https://apiobra.vercel.app/servicos/confirmarFinalizacao?servico_id=${servico_id}&resposta=sim 
+                ou recuse aqui: https://apiobra.vercel.app/servicos/confirmarFinalizacao?servico_id=${servico_id}&resposta=nao
             `;
 
             await sendEmail(contratante.email, "Confirmação de Finalização do Serviço", emailBody);
@@ -241,7 +241,7 @@ class ServicoController {
                 await database('servicos_postados')
                     .where({ id: servico_id })
                     .update({
-                        status: 'finalizado',
+                        status: 'finalizado'
                         // data_fim: getBrazilianTimestamp()
                     });
 
