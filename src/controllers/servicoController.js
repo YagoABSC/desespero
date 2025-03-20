@@ -242,7 +242,7 @@ class ServicoController {
                     .where({ id: servico_id })
                     .update({
                         status: 'finalizado',
-                        data_fim: getBrazilianTimestamp()
+                        // data_fim: getBrazilianTimestamp()
                     });
 
                 console.log(`✅ Serviço ${servico_id} finalizado com sucesso.`);
